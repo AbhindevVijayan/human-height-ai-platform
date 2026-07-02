@@ -1,0 +1,26 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Environment
+.env
+
+# Temporary uploads
+ai-engine/temp_uploads/
+
+# Databases
+*.db
+
+# Trained models
+*.pkl
+
+# Registry generated after training
+**/model_registry.json
+
+# Generated datasets
+**/features.csv
