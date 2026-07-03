@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Train from "./pages/Train";
 import About from "./pages/About";
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Route path="/history" element={<Layout><History />  </Layout>} />
         <Route path="/train" element={<Layout> <Train />   </Layout>} />
         <Route path="/about" element={<Layout> <About />  </Layout>} />
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );

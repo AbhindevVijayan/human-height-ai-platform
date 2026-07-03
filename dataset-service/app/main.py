@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse
-
+from fastapi import Body
 import os
 import shutil
 from app.database.db import Base, engine
@@ -11,6 +11,7 @@ from app.database.crud import (
     add_prediction,
     get_predictions
 )
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,7 +19,13 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Human Height Dataset Service"
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 STORAGE_PATH = "app/storage"
 
@@ -205,4 +212,22 @@ def list_predictions():
 
     return {
         "predictions": get_predictions()
+    }
+
+@app.post("/admin/login")
+def admin_login(data: dict = Body(...)):
+
+    username = data.get("username")
+    password = data.get("password")
+
+    if username == "admin" and password == "admin123":
+
+        return {
+            "success": True,
+            "message": "Login successful"
+        }
+
+    return {
+        "success": False,
+        "message": "Invalid credentials"
     }
