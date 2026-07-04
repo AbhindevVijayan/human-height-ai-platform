@@ -96,6 +96,7 @@ class HeightPredictor:
         prediction = self.model.predict(
             X
         )
+        print("Prediction:", prediction)
 
 
         return round(
