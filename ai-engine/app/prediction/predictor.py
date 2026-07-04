@@ -85,6 +85,13 @@ class HeightPredictor:
 
         self.model = load_active_model()
         
+        print("\n========== EXTRACTED FEATURES ==========")
+        print(data)
+        print("Age:", age)
+        print("Weight:", weight)
+        print("Camera Distance:", camera_distance)
+        print("Gender:", gender)
+        print("Model Input:", X)
         
         prediction = self.model.predict(
             X
