@@ -7,8 +7,9 @@ import os
 import time
 import requests
 import json
-from app.prediction.predictor import HeightPredictor
+
 from fastapi.middleware.cors import CORSMiddleware
+from app.prediction.predictor import HeightPredictor
 
 app = FastAPI(
     title="Human Height AI Engine"
