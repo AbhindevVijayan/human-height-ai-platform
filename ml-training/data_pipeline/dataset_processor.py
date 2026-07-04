@@ -1,5 +1,5 @@
 import csv
-import os
+
 from data_pipeline.sync.dataset_client import DatasetClient
 from feature_generator import FeatureGenerator
 
@@ -61,31 +61,25 @@ class DatasetProcessor:
 
         if rows:
             
-            file_exists = os.path.exists(OUTPUT_FILE)
-
-
             with open(
 
-                OUTPUT_FILE,
+                  OUTPUT_FILE,
 
-                "a",
+                   "w",
 
-                newline=""
+                    newline=""
 
             ) as file:
-
 
                 writer = csv.DictWriter(
 
                     file,
 
-                    fieldnames=rows[0].keys()
+                   fieldnames=rows[0].keys()
 
-                )
+            )
 
-
-                if not file_exists:
-                 writer.writeheader()
+                writer.writeheader()
 
                 writer.writerows(rows)
 
