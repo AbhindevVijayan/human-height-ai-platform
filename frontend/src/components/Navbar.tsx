@@ -15,7 +15,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-3">
                     <BrainCircuit className="text-indigo-500" size={30} />
                     <h1 className="text-xl font-bold text-slate-800 dark:text-white">
-                        Human Height AI
+                        MeasureWise AI
                     </h1>
                 </div>
 
@@ -25,16 +25,13 @@ const Navbar = () => {
                         Dashboard
                     </NavLink>
 
-                    <NavLink to="/history" className={linkStyle}>
-                        History
-                    </NavLink>
-
-                    <NavLink to="/train" className={linkStyle}>
-                        Train
-                    </NavLink>
 
                     <NavLink to="/about" className={linkStyle}>
                         About
+                    </NavLink>
+
+                    <NavLink to="/Login" className={linkStyle}>
+                        Login
                     </NavLink>
 
                     <ThemeToggle />

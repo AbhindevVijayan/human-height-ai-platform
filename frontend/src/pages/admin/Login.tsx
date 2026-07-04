@@ -65,7 +65,7 @@ function Login() {
 
                 <p className="text-center text-slate-500 mb-8">
 
-                    Human Height AI Platform
+                    settings.platform_name
 
                 </p>
 

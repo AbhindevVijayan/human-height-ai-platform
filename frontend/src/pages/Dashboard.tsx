@@ -73,7 +73,7 @@ const Dashboard = () => {
 
                 <h1 className="text-5xl font-bold text-slate-900 dark:text-white">
 
-                    Human Height AI Platform
+                    MeasureWise AI
 
                 </h1>
 

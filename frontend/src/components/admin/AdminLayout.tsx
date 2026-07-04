@@ -86,75 +86,32 @@ function AdminLayout({ children }: Props) {
 
                 <nav className="flex-1 p-4 space-y-2">
 
-                    <NavLink
-                        to="/admin/dashboard"
-                        className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200
-                             ${isActive
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                            }`
-                        }
-                    >
-                        <LayoutDashboard size={20} />
-                        Dashboard
-                    </NavLink>
+                    {menu.map((item) => {
 
-                    <NavLink
-                        to="/admin/history"
-                        className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200
-                             ${isActive
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                            }`
-                        }
-                    >
-                        <History size={20} />
-                        Prediction Logs
-                    </NavLink>
+                        const Icon = item.icon;
 
-                    <NavLink
-                        to="/admin/dataset"
-                        className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200
-            ${isActive
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                            }`
-                        }
-                    >
-                        <Database size={20} />
-                        Dataset Manager
-                    </NavLink>
+                        return (
 
-                    <NavLink
-                        to="/admin/training"
-                        className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200
-            ${isActive
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                            }`
-                        }
-                    >
-                        <BrainCircuit size={20} />
-                        Model Training
-                    </NavLink>
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${isActive
+                                        ? "bg-indigo-600 text-white shadow-lg"
+                                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                                    }`
+                                }
+                            >
 
-                    <NavLink
-                        to="/admin/settings"
-                        className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200
-            ${isActive
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                            }`
-                        }
-                    >
-                        <Settings size={20} />
-                        Settings
-                    </NavLink>
+                                <Icon size={20} />
+
+                                <span>{item.title}</span>
+
+                            </NavLink>
+
+                        );
+
+                    })}
 
                 </nav>
 
@@ -164,7 +121,7 @@ function AdminLayout({ children }: Props) {
 
                         onClick={logout}
 
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 py-3"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 py-3 transition"
 
                     >
 
@@ -181,8 +138,6 @@ function AdminLayout({ children }: Props) {
             {/* Main */}
 
             <main className="flex-1">
-
-                {/* Top Header */}
 
                 <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-5 flex justify-between items-center">
 

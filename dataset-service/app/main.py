@@ -1,24 +1,25 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Body
 from fastapi.responses import FileResponse
-from fastapi import Body
+from fastapi.middleware.cors import CORSMiddleware
+
 import os
 import shutil
+from app.settings import router as settings_router
 from app.database.db import Base, engine
-from app.database.models import DatasetSample, PredictionHistory
 from app.database.crud import (
     add_sample,
     get_samples,
+    delete_sample,
     add_prediction,
     get_predictions
 )
-from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
-
 
 app = FastAPI(
     title="Human Height Dataset Service"
 )
+app.include_router(settings_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -29,23 +30,30 @@ app.add_middleware(
 
 STORAGE_PATH = "app/storage"
 
-
 os.makedirs(
     STORAGE_PATH,
     exist_ok=True
 )
 
-
+# ---------------------------------------------------------
+# Home
+# ---------------------------------------------------------
 
 @app.get("/")
 def home():
 
     return {
+
         "service": "dataset-service",
+
         "status": "running"
+
     }
 
 
+# ---------------------------------------------------------
+# Dataset Upload
+# ---------------------------------------------------------
 
 @app.post("/dataset/upload")
 async def upload_dataset(
@@ -64,13 +72,10 @@ async def upload_dataset(
 
 ):
 
-
     file_path = os.path.join(
         STORAGE_PATH,
         image.filename
     ).replace("\\", "/")
-
-
 
     with open(
         file_path,
@@ -82,25 +87,23 @@ async def upload_dataset(
             buffer
         )
 
+    sample_data = {
 
+        "image": file_path,
 
-    sample_id = add_sample(
+        "height": height,
 
-        file_path,
+        "gender": gender,
 
-        height,
+        "age": age,
 
-        gender,
+        "weight": weight,
 
-        age,
+        "camera_distance": camera_distance
 
-        weight,
+    }
 
-        camera_distance
-
-    )
-
-
+    sample_id = add_sample(sample_data)
 
     if sample_id is None:
 
@@ -111,8 +114,6 @@ async def upload_dataset(
             "image": image.filename
 
         }
-
-
 
     return {
 
@@ -135,7 +136,9 @@ async def upload_dataset(
     }
 
 
-
+# ---------------------------------------------------------
+# Dataset
+# ---------------------------------------------------------
 
 @app.get("/dataset/list")
 def list_dataset():
@@ -148,35 +151,23 @@ def list_dataset():
 
 
 
+@app.delete("/dataset/{sample_id}")
+def remove_dataset(sample_id: int):
 
-@app.get("/dataset/image/{filename}")
-def get_image(filename: str):
+    deleted = delete_sample(sample_id)
 
-    file_path = os.path.join(
+    if deleted:
 
-        STORAGE_PATH,
-
-        filename
-
-    )
-
-
-
-    if os.path.exists(file_path):
-
-        return FileResponse(
-
-            file_path
-
-        )
-
-
+        return {
+            "success": True,
+            "message": "Dataset sample deleted"
+        }
 
     return {
-
-        "error": "Image not found"
-
+        "success": False,
+        "message": "Sample not found"
     }
+
 @app.get("/dataset/image/{filename}")
 def get_image(filename: str):
 
@@ -187,47 +178,68 @@ def get_image(filename: str):
 
     if os.path.exists(file_path):
 
-        return FileResponse(
-            file_path
-        )
+        return FileResponse(file_path)
 
     return {
+
         "error": "Image not found"
+
     }
-    
+
+
+# ---------------------------------------------------------
+# Prediction History
+# ---------------------------------------------------------
+
 @app.post("/prediction/save")
 def save_prediction(data: dict):
 
     prediction_id = add_prediction(data)
 
     return {
-        "id": prediction_id,
-        "status": "saved"
-    }
 
+        "id": prediction_id,
+
+        "status": "saved"
+
+    }
 
 
 @app.get("/prediction/list")
 def list_predictions():
 
     return {
+
         "predictions": get_predictions()
+
     }
+
+
+# ---------------------------------------------------------
+# Admin
+# ---------------------------------------------------------
 
 @app.post("/admin/login")
 def admin_login(data: dict = Body(...)):
 
     username = data.get("username")
+
     password = data.get("password")
 
     if username == "admin" and password == "admin123":
 
         return {
+
             "success": True,
+
             "message": "Login successful"
+
         }
 
     return {
+
         "success": False,
+
         "message": "Invalid credentials"
+
     }

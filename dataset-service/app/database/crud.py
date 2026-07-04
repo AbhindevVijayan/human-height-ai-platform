@@ -83,3 +83,25 @@ def get_predictions():
         }
         for p in predictions
     ]
+
+def delete_sample(sample_id: int):
+
+    db = SessionLocal()
+
+    sample = db.query(DatasetSample).filter(
+        DatasetSample.id == sample_id
+    ).first()
+
+    if sample is None:
+
+        db.close()
+
+        return False
+
+    db.delete(sample)
+
+    db.commit()
+
+    db.close()
+
+    return True
