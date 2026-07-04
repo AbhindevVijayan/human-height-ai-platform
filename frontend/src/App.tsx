@@ -78,7 +78,7 @@ function App() {
         />
 
         <Route
-          path="/Login"
+          path="/login"
           element={<Layout><Login /></Layout>}
         />
 

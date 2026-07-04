@@ -1,6 +1,14 @@
 from .db import SessionLocal
-from .models import DatasetSample, PredictionHistory
+from .models import (
+    DatasetSample,
+    PredictionHistory,
+    User
+)
 
+from .security import (
+    hash_password,
+    verify_password
+)
 
 def add_sample(data):
 
@@ -105,3 +113,95 @@ def delete_sample(sample_id: int):
     db.close()
 
     return True
+
+# ---------------------------------------------------------
+# User Authentication
+# ---------------------------------------------------------
+
+def get_user_by_email(email: str):
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    db.close()
+
+    return user
+
+
+def create_user(
+
+    full_name: str,
+
+    email: str,
+
+    password: str
+
+):
+
+    db = SessionLocal()
+
+    existing = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    if existing:
+
+        db.close()
+
+        return None
+
+    user = User(
+
+        full_name=full_name,
+
+        email=email,
+
+        password_hash=hash_password(password)
+
+    )
+
+    db.add(user)
+
+    db.commit()
+
+    db.refresh(user)
+
+    db.close()
+
+    return user
+
+
+def authenticate_user(
+
+    email: str,
+
+    password: str
+
+):
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    db.close()
+
+    if not user:
+
+        return None
+
+    if not verify_password(
+
+        password,
+
+        user.password_hash
+
+    ):
+
+        return None
+
+    return user

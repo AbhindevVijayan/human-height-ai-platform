@@ -1,8 +1,126 @@
-import { Link } from "react-router-dom";
-import { BrainCircuit, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+import {
+    BrainCircuit,
+    Mail,
+    Lock,
+    Eye,
+    EyeOff,
+    LogIn
+} from "lucide-react";
+
+import { loginUser } from "../api/auth";
 
 function Login() {
 
+    const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const [error, setError] = useState("");
+
+    const [form, setForm] = useState({
+
+        email: "",
+
+        password: ""
+
+    });
+
+    function updateField(
+
+        e: React.ChangeEvent<HTMLInputElement>
+
+    ) {
+
+        setForm({
+
+            ...form,
+
+            [e.target.name]: e.target.value
+
+        });
+
+    }
+    async function handleLogin(
+
+        e: React.FormEvent
+
+    ) {
+
+        e.preventDefault();
+
+        setError("");
+
+        setLoading(true);
+
+        try {
+
+            const response = await loginUser({
+                email: form.email,
+                password: form.password,
+            });
+
+            if (!response.success) {
+
+                setError(
+
+                    response.message
+
+                );
+
+                setLoading(false);
+
+                return;
+
+            }
+
+            localStorage.setItem(
+
+                "access_token",
+
+                response.access_token
+
+            );
+
+            localStorage.setItem(
+
+                "user",
+
+                JSON.stringify(
+
+                    response.user
+
+                )
+
+            );
+
+            navigate("/");
+
+        }
+
+        catch (err: any) {
+
+            setError(
+
+                err?.response?.data?.message ||
+
+                "Unable to login."
+
+            );
+
+        }
+
+        finally {
+
+            setLoading(false);
+
+        }
+
+    }
     return (
 
         <div className="min-h-[80vh] flex items-center justify-center">
@@ -24,31 +142,54 @@ function Login() {
 
                     <p className="text-slate-500 mt-2 text-center">
 
-                        Login to access your prediction history and personalized features.
+                        Sign in to access your AI-powered height prediction dashboard.
 
                     </p>
 
                 </div>
 
-                <form className="mt-10 space-y-6">
+                <form
+
+                    onSubmit={handleLogin}
+
+                    className="mt-10 space-y-6"
+
+                >
 
                     <div>
 
                         <label className="block text-sm font-semibold mb-2">
 
-                            Email
+                            Email Address
 
                         </label>
 
-                        <input
+                        <div className="relative">
 
-                            type="email"
+                            <Mail
+                                className="absolute left-4 top-4 text-slate-400"
+                                size={20}
+                            />
 
-                            placeholder="Enter your email"
+                            <input
 
-                            className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-200"
+                                type="email"
 
-                        />
+                                name="email"
+
+                                value={form.email}
+
+                                onChange={updateField}
+
+                                placeholder="Enter your email"
+
+                                required
+
+                                className="w-full pl-12 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-200"
+
+                            />
+
+                        </div>
 
                     </div>
 
@@ -60,29 +201,100 @@ function Login() {
 
                         </label>
 
-                        <input
+                        <div className="relative">
 
-                            type="password"
+                            <Lock
+                                className="absolute left-4 top-4 text-slate-400"
+                                size={20}
+                            />
 
-                            placeholder="Enter your password"
+                            <input
 
-                            className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-200"
+                                type={showPassword ? "text" : "password"}
 
-                        />
+                                name="password"
+
+                                value={form.password}
+
+                                onChange={updateField}
+
+                                placeholder="Enter your password"
+
+                                required
+
+                                className="w-full pl-12 pr-12 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-200"
+
+                            />
+
+                            <button
+
+                                type="button"
+
+                                onClick={() =>
+
+                                    setShowPassword(
+
+                                        !showPassword
+
+                                    )
+
+                                }
+
+                                className="absolute right-4 top-4"
+
+                            >
+
+                                {
+
+                                    showPassword ?
+
+                                        <EyeOff size={20} /> :
+
+                                        <Eye size={20} />
+
+                                }
+
+                            </button>
+
+                        </div>
 
                     </div>
 
+                    {
+
+                        error && (
+
+                            <div className="text-red-500 text-sm">
+
+                                {error}
+
+                            </div>
+
+                        )
+
+                    }
+
                     <button
 
-                        type="button"
+                        type="submit"
+
+                        disabled={loading}
 
                         className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-2xl py-4 font-semibold flex items-center justify-center gap-3 transition"
 
                     >
 
-                        Login
+                        <LogIn size={20} />
 
-                        <ArrowRight size={20} />
+                        {
+
+                            loading ?
+
+                                "Signing In..." :
+
+                                "Login"
+
+                        }
 
                     </button>
 

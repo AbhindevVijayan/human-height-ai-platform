@@ -1,9 +1,10 @@
 from fastapi import FastAPI, UploadFile, File, Form, Body
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+from pydantic import BaseModel, EmailStr
 import os
 import shutil
+from app.auth import create_access_token
 from app.settings import router as settings_router
 from app.database.db import Base, engine
 from app.database.crud import (
@@ -11,7 +12,9 @@ from app.database.crud import (
     get_samples,
     delete_sample,
     add_prediction,
-    get_predictions
+    get_predictions,
+    create_user,
+    authenticate_user
 )
 
 Base.metadata.create_all(bind=engine)
@@ -241,5 +244,130 @@ def admin_login(data: dict = Body(...)):
         "success": False,
 
         "message": "Invalid credentials"
+
+    }
+    
+# ---------------------------------------------------------
+# Authentication Schemas
+# ---------------------------------------------------------
+
+class RegisterRequest(BaseModel):
+
+    full_name: str
+
+    email: EmailStr
+
+    password: str
+
+
+class LoginRequest(BaseModel):
+
+    email: EmailStr
+
+    password: str
+    
+    
+# ---------------------------------------------------------
+# User Registration
+# ---------------------------------------------------------
+
+@app.post("/auth/register")
+def register_user(data: RegisterRequest):
+
+    user = create_user(
+
+        full_name=data.full_name,
+
+        email=data.email,
+
+        password=data.password
+
+    )
+
+    if user is None:
+
+        return {
+
+            "success": False,
+
+            "message": "Email already exists."
+
+        }
+
+    return {
+
+        "success": True,
+
+        "message": "Registration successful.",
+
+        "user": {
+
+            "id": user.id,
+
+            "full_name": user.full_name,
+
+            "email": user.email
+
+        }
+
+    }
+
+
+# ---------------------------------------------------------
+# User Login
+# ---------------------------------------------------------
+
+@app.post("/auth/login")
+def login_user(data: LoginRequest):
+
+    user = authenticate_user(
+
+        email=data.email,
+
+        password=data.password
+
+    )
+
+    if user is None:
+
+        return {
+
+            "success": False,
+
+            "message": "Invalid email or password."
+
+        }
+
+    token = create_access_token(
+
+        {
+
+            "sub": str(user.id),
+
+            "email": user.email
+
+        }
+
+    )
+
+    return {
+
+        "success": True,
+
+        "message": "Login successful.",
+
+        "access_token": token,
+
+        "token_type": "bearer",
+
+        "user": {
+
+            "id": user.id,
+
+            "full_name": user.full_name,
+
+            "email": user.email
+
+        }
 
     }
